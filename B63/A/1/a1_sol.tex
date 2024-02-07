@@ -114,4 +114,28 @@ Hence, {\ital f} $\in \bigo{g}$, as wanted. $\Box$ \pagebreak
 
 \subsection*{Question 2}
 
+Inserting (9) \\
+
+\begin{center}
+    \begin{tikzpicture}
+      \draw[level distance=15mm, level/.style={sibling distance=20mm}, every node/.style={circle,draw},
+            edge from parent/.style={-latex,draw}, font=\rmfamily]
+      node{9};
+    \end{tikzpicture}
+\end{center}
+
+\noindent
+Inserting (10) \\
+
+\begin{center}
+    \begin{tikzpicture}
+      \draw[level distance=15mm, level/.style={sibling distance=20mm}, every node/.style={circle,draw},
+            edge from parent/.style={-latex,draw}, font=\rmfamily]
+      node{9}
+        child{node{10}
+        child[missing]
+      };
+    \end{tikzpicture}
+\end{center}
+
 \end{document}
