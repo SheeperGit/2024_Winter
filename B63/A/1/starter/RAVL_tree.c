@@ -10,22 +10,22 @@
  ** Suggested helper functions
  *************************************************************************/
 
-/* Returns the height (number of nodes on the longest root-to-leaf path) of
- * the tree rooted at node 'node'. Returns 0 if 'node' is NULL.  Note: this
+/* Returns the height (number of nodes on the longest node-to-leaf path) of
+ * the tree nodeed at node 'node'. Returns 0 if 'node' is NULL.  Note: this
  * should be an O(1) operation.
  */
 int height(RAVL_Node* node){
   return (node == NULL) ? 0 : node->height;
 }
 
-/* Returns the size (number of nodes) of the tree rooted at node 'node'.
+/* Returns the size (number of nodes) of the tree nodeed at node 'node'.
  * Returns 0 if 'node' is NULL.  Note: this should be an O(1) operation.
  */
 int size(RAVL_Node* node){
   return (node == NULL) ? 0 : node->size;
 }
 
-/* Updates the height of the tree rooted at node 'node' based on the heights
+/* Updates the height of the tree nodeed at node 'node' based on the heights
  * of its children. Note: this should be an O(1) operation.
  */
 void updateHeight(RAVL_Node* node){
@@ -53,7 +53,7 @@ void updateHeight(RAVL_Node* node){
   node->height = (node->left->height > node->right->height) ? node->left->height + 1 : node->right->height + 1;
 }
 
-/* Updates the size of the tree rooted at node 'node' based on the sizes
+/* Updates the size of the tree nodeed at node 'node' based on the sizes
  * of its children. Note: this should be an O(1) operation.
  */
 void updateSize(RAVL_Node* node){
@@ -90,27 +90,27 @@ int balanceFactor(RAVL_Node* node){
 }
 
 /* Returns the result of performing the corresponding rotation in the RAVL
- * tree rooted at 'node'.
+ * tree nodeed at 'node'.
  */
 // single rotations: right/clockwise
 RAVL_Node* rightRotation(RAVL_Node* node){
-  RAVL_Node *newRoot = node->left;
-  RAVL_Node *tmp = newRoot->right;
+  RAVL_Node *newnode = node->left;
+  RAVL_Node *tmp = newnode->right;
 
-  newRoot->right = node;
+  newnode->right = node;
   node->left = tmp;
 
-  return newRoot;
+  return newnode;
 }
 // single rotations: left/counter-clockwise
 RAVL_Node* leftRotation(RAVL_Node* node){
-  RAVL_Node *newRoot = node->right;
-  RAVL_Node *tmp = newRoot->left;
+  RAVL_Node *newnode = node->right;
+  RAVL_Node *tmp = newnode->left;
 
-  newRoot->left = node;
+  newnode->left = node;
   node->right = tmp;
 
-  return newRoot;
+  return newnode;
 }
 // double rotation: right/clockwise then left/counter-clockwise
 RAVL_Node* rightLeftRotation(RAVL_Node* node){
@@ -181,7 +181,7 @@ void deleteTree(RAVL_Node* node) {
 
 /*************************************************************************
  ** Required functions
- ** Must run in O(log n) where n is the number of nodes in a tree rooted
+ ** Must run in O(log n) where n is the number of nodes in a tree nodeed
  **  at 'node'.
  *************************************************************************/
 
@@ -202,37 +202,132 @@ RAVL_Node* search(RAVL_Node* node, int key) {
 }
 
 RAVL_Node* insert(RAVL_Node* node, int key, void* value) {
-  if (height(node->left) - height(node->right) > 1){
-    RAVL_Node *problemNode = node->left;
-    if (height(problemNode->left) >= height(problemNode->right)){
-      rightRotation(problemNode); // Assign to which node? Create + Fill node where?
-    }
-    else {
-      leftRightRotation(problemNode); // Assign to which node? Create + Fill node where?
-    }
+  if (node == NULL) {
+    return createNode(key, value);
   }
-  else if (height(node->right) - height(node->left) > 1){
-    RAVL_Node *problemNode = node->right;
-    if (height(problemNode->left) <= height(problemNode->right)){
-      leftRotation(problemNode); // Assign to which node? Create + Fill node where?
-    }
-    else {
-      rightLeftRotation(problemNode); // Assign to which node? Create + Fill node where?
-    }
-  }
+
+  if (node->key > key) {
+    // Insert into left subtree //
+    node->left = insert(node->left, key, value);
+  } 
+  else if (node->key < key) {
+    // Insert into right subtree //
+    node->right = insert(node->right, key, value);
+  } 
   else {
-    // Insert normally somehow?
+    // If duplicate key, just update the value. (Assumption) //
+    node->value = value;
+    return node;
   }
+
+  node->height = (node->left->height > node->right->height) ? node->left->height + 1 : node->right->height + 1;
+  int balance = balanceFactor(node); // More efficient to compute balanceFactor() once, rather than compute height() several times //
+
+  if (balance > 1) {
+    if (node->left->key > key) { // CR //
+      return rightRotation(node); 
+    } 
+    else {                      // CCR -> CR //
+      node->left = leftRotation(node->left);
+      return rightRotation(node);
+    }
+  }
+
+  if (balance < -1) {
+    if (node->right->key < key) { // CCR //
+      return leftRotation(node);
+    } 
+    else {                        // CR -> CCR //
+      node->right = rightRotation(node->right);
+      return leftRotation(node);
+    }
+  }
+
+  return node;
 }
+
 
 RAVL_Node* delete(RAVL_Node* node, int key) {
-  return NULL;
+  if (node == NULL) {
+    return NULL;
+  }
+
+  // Found the node to delete! //
+  if(node->key == key){
+    // No children //
+    if (node->left == NULL && node->right == NULL){
+      free(node);
+      return NULL;
+    }
+
+    // Right Child Only //
+    if (node->left == NULL){
+      RAVL_Node *tmp = node->right;
+      free(node);
+      return tmp;
+    }
+
+    // Left Child Only //
+    if (node->right == NULL){
+      RAVL_Node *tmp = node->left;
+      free(node);
+      return tmp;
+    }
+
+    // Two children //
+    RAVL_Node *tmp = successor(node->right);
+
+    // Copy over contents of successor to soon-to-be-deleted node //
+    node->key = tmp->key;
+    node->value = tmp->value;
+
+    // Delete successor //
+    node->right = delete(node->right, tmp->key);
+  }
+
+  if (node->key > key){
+    node->left = delete(node->left, key);
+  } 
+  else {
+    node->right = delete(node->right, key);
+  }
+
+  // Don't forget to update height and size! //
+  node->height = (node->left->height > node->right->height) ? node->left->height + 1 : node->right->height + 1;
+  node->size = size(node->left) + size(node->right) + 1;
+
+  return node;
 }
+
 
 int rank(RAVL_Node* node, int key) {
-  return NOTIN;
+  if (node == NULL) {
+    return NOTIN;
+  }
+  if (node->key > key) {
+    return rank(node->left, key);
+  } 
+  else if (node->key < key) {
+    return 1 + size(node->left) + rank(node->right, key);
+  } 
+  else {
+    return size(node->left) + 1;
+  }
 }
 
+// Equivalent to `select` //
 RAVL_Node* findRank(RAVL_Node* node, int rank) {
-  return NULL;
+  if (node == NULL){
+    return NULL;
+  }
+  
+  int leftSize = size(node->left) + 1;
+  if (leftSize > rank) {
+    return findRank(node->left, rank); // Look for `rank` in left subtree //
+  }
+  if (leftSize == rank) {
+    return node; // Found it! //
+  }
+  return findRank(node->right, rank - leftSize); // Look for `rank` in right subtree //
 }
+
