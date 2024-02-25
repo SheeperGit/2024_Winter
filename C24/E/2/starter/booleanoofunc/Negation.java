@@ -1,26 +1,29 @@
 package booleanoofunc;
 
-/**
- * A unary negation.
- */
-public class Negation {
+import java.util.Map;
 
-  /**
-   * Creates a new "not operand".
-   *
-   * @param operand the operand of this Negation
-   */
+public class Negation extends UnaryExpression {
   public Negation(BooleanExpression operand) {
-    super(x -> !x, operand, Negation::simplifyNot);
-  }
-
-  private static BooleanExpression simplifyNot(BooleanExpression expr,
-      Map<String, Boolean> context) {
-      return null;
+      super(x -> !x, operand);
   }
 
   @Override
-  public String toStringOp() {
-    return Constants.NOT;
+  public BooleanExpression simplify(Map<String, Boolean> context) {
+      BooleanExpression simplifiedOperand = operand.simplify(context);
+      return new Negation(simplifiedOperand);
+  }
+
+  @Override
+  public BooleanExpression simplifyOnce(Map<String, Boolean> context) {
+      if (operand instanceof Negation) {
+          // (not (not x)) == x //
+          return ((Negation) operand).getOperand().simplify(context);
+      }
+      return new Negation(operand.simplify(context));
+  }
+
+  @Override
+  protected String toStringOp() {
+      return Constants.NOT;
   }
 }

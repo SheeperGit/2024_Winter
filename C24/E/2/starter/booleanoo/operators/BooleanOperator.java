@@ -3,5 +3,7 @@ package booleanoo.operators;
 /**
  * A boolean operator.
  */
-public BooleanOperator {
+public interface BooleanOperator {
+    String toString();
+    boolean equals(Object other);
 }

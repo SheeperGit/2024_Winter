@@ -86,7 +86,7 @@ public class BooleanEvalFunc {
         new IffExpression(new Conjunction(new BooleanValue(true), new Variable("c")),
             new Conjunction(new Negation(new Variable("b")), new Variable("c"))));
 
-    System.out.println(String.format("\n\tExpresison %s", expr));
+    System.out.println(String.format("\n\tExpression %s", expr));
     System.out.println(String.format("under context %s", context));
     try {
       System.out.println(String.format("evaluates to %s", expr.evaluate(context)));
@@ -100,7 +100,7 @@ public class BooleanEvalFunc {
         new Negation(new Negation(new Conjunction(new Variable("a"), new Variable("c")))),
         new Variable("b"));
 
-    System.out.println(String.format("\n\tExpresison %s", expr2));
+    System.out.println(String.format("\n\tExpression %s", expr2));
     System.out.println(String.format("under context %s", context2));
     try {
       System.out.println(expr2.evaluate(context2));
@@ -113,7 +113,7 @@ public class BooleanEvalFunc {
     BooleanExpression expr3 = new Negation(
         new Implication(new Variable("a"), new BooleanValue(false)));
 
-    System.out.println(String.format("\n\tExpresison %s", expr3));
+    System.out.println(String.format("\n\tExpression %s", expr3));
     System.out.println(String.format("under context %s", context2));
     try {
       System.out.println(expr3.evaluate(context2));

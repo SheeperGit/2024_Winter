@@ -3,5 +3,6 @@ package booleanoo.operators;
 /**
  * A unary boolean operator.
  */
-public UnaryOperator {
+public interface UnaryOperator extends BooleanOperator {
+    boolean apply(boolean operand);
 }
