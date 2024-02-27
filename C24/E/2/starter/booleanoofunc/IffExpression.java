@@ -1,6 +1,5 @@
 package booleanoofunc;
 
-import java.util.Arrays;
 import java.util.Map;
 
 public class IffExpression extends BinaryExpression {
