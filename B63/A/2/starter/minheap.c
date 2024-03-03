@@ -80,6 +80,126 @@ int indexOf(MinHeap* heap, int id);
  * Required functions
  ********************************************************************/
 
+/* Returns the node with minimum priority in minheap 'heap'.
+ * Precondition: heap is non-empty
+ */
+HeapNode getMin(MinHeap* heap){
+    return heap->arr[ROOT_INDEX];
+}
+
+/* Removes and returns the node with minimum priority in minheap 'heap'.
+ * Precondition: heap is non-empty
+ */
+HeapNode extractMin(MinHeap* heap) {
+    HeapNode minNode = heap->arr[1];
+
+    heap->arr[1] = heap->arr[heap->size]; // Replace root w/ last elem
+    heap->indexMap[heap->arr[1].id] = 1;  // Update indexMap for the moved node
+    heap->size--;
+
+    // Bubble-down //
+    int cur = 1;
+    while (true) {
+       int leftChild = cur * 2;
+       int rightChild = cur * 2 + 1;
+       int smallest = cur;
+
+       // If there exists a leftChild and priority(leftChild) < priority(cur) //
+       if (leftChild <= heap->size && heap->arr[leftChild].priority < heap->arr[cur].priority) {
+              smallest = leftChild;
+       }
+
+       // If there exists a rightChild and priority(rightChild) < priority(cur) //
+       if (rightChild <= heap->size && heap->arr[rightChild].priority < heap->arr[smallest].priority) {
+              smallest = rightChild;
+       }
+
+       if (smallest != cur) {
+              // Swap nodes //
+              HeapNode temp = heap->arr[cur];
+              heap->arr[cur] = heap->arr[smallest];
+              heap->arr[smallest] = temp;
+
+              // Update indexMap for swapped nodes //
+              heap->indexMap[heap->arr[cur].id] = cur;
+              heap->indexMap[heap->arr[smallest].id] = smallest;
+
+              // Move on to next level //
+              cur = smallest;
+       } 
+       
+       // If cur node is smaller than both children, then the heap property holds //
+       else {
+              break; 
+       }
+    }
+
+    return minNode;
+}
+
+/* Inserts a new node with priority 'priority' and ID 'id' into minheap 'heap'.
+ * Precondition: 'id' is unique within this minheap
+ *               0 <= 'id' < heap->capacity
+ *               heap->size < heap->capacity
+ */
+void insert(MinHeap* heap, int priority, int id) {
+    // Place new node at end of heap //
+    int cur = ++heap->size;
+    heap->arr[cur].priority = priority;
+    heap->arr[cur].id = id;
+    heap->indexMap[id] = cur;      // Update indexMap for new node
+
+    // Bubble-Up //
+    // If we're not at the top of the heap and priority(cur) < priority(cur->parent) //
+    while (cur > 1 && heap->arr[cur].priority < heap->arr[cur / 2].priority) {
+       // Swap the cur node w/ its parent //
+       HeapNode temp = heap->arr[cur];
+       heap->arr[cur] = heap->arr[cur / 2];
+       heap->arr[cur / 2] = temp;
+
+       // Update the indexMap for swapped nodes //
+       heap->indexMap[heap->arr[cur].id] = cur;
+       heap->indexMap[heap->arr[cur / 2].id] = cur / 2;
+
+       // Move up to parent level //
+       cur /= 2;
+    }
+}
+
+/* Sets priority of node with ID 'id' in minheap 'heap' to 'newPriority', if
+ * such a node exists in 'heap' and its priority is larger than
+ * 'newPriority', and returns True. Has no effect and returns False, otherwise.
+ * Note: this function bubbles up the node until the heap property is restored.
+ */
+bool decreasePriority(MinHeap* heap, int id, int newPriority) {
+    int index = heap->indexMap[id];
+
+    // Check if ID is OoB or doesn't exist in the heap //
+    if (id < 0 || id >= heap->capacity || index == 0 || newPriority >= heap->arr[index].priority) {
+       return false;
+    }
+
+    heap->arr[index].priority = newPriority;
+
+    // Bubble-Up //
+    // If we're not at the top of the heap and priority(cur) < priority(cur->parent) //
+    while (index > 1 && heap->arr[index].priority < heap->arr[index / 2].priority) {
+       // Swap cur node w/ its parent //
+       HeapNode temp = heap->arr[index];
+       heap->arr[index] = heap->arr[index / 2];
+       heap->arr[index / 2] = temp;
+
+       // Update indexMap for swapped nodes //
+       heap->indexMap[heap->arr[index].id] = index;
+       heap->indexMap[heap->arr[index / 2].id] = index / 2;
+
+       // Move to parent level //
+       index /= 2;
+    }
+
+    return true;
+}
+
 
 /*********************************************************************
  ** Helper function provided
