@@ -17,64 +17,90 @@
  * and 'index2' are valid indices for minheap 'heap'. Has no effect
  * otherwise.
  */
-void swap(MinHeap* heap, int index1, int index2);
+void swap(MinHeap* heap, int index1, int index2) {
+       return;
+}
 
 /* Bubbles up the element newly inserted into minheap 'heap' at index
  * 'nodeIndex', if 'nodeIndex' is a valid index for heap. Has no effect
  * otherwise.
  */
-void bubbleUp(MinHeap* heap, int nodeIndex);
+void bubbleUp(MinHeap* heap, int nodeIndex) {
+       return;
+}
 
 /* Bubbles down the element newly inserted into minheap 'heap' at the root,
  * if it exists. Has no effect otherwise.
  */
-void bubbleDown(MinHeap* heap);
+void bubbleDown(MinHeap* heap) {
+       return;
+}
 
 /* Returns the index of the left child of a node at index 'nodeIndex' in
  * minheap 'heap', if such exists.  Returns NOTHING if there is no such left
  * child.
  */
-int leftIdx(MinHeap* heap, int nodeIndex);
+int leftIdx(MinHeap* heap, int nodeIndex) {
+       return -1;
+}
 
 /* Returns the index of the right child of a node at index 'nodeIndex' in
  * minheap 'heap', if such exists.  Returns NOTHING if there is no such right
  * child.
  */
-int rightIdx(MinHeap* heap, int nodeIndex);
+int rightIdx(MinHeap* heap, int nodeIndex) {
+       return -1;
+}
 
 /* Returns the index of the parent of a node at index 'nodeIndex' in minheap
  * 'heap', if such exists.  Returns NOTHING if there is no such parent.
  */
-int parentIdx(MinHeap* heap, int nodeIndex);
+int parentIdx(MinHeap* heap, int nodeIndex) {
+       return -1;
+}
 
 /* Returns True if 'maybeIdx' is a valid index in minheap 'heap', and 'heap'
  * stores an element at that index. Returns False otherwise.
  */
-bool isValidIndex(MinHeap* heap, int maybeIdx);
+bool isValidIndex(MinHeap* heap, int maybeIdx){
+       return false;
+}
 
 /* Returns node at index 'nodeIndex' in minheap 'heap'.
  * Precondition: 'nodeIndex' is a valid index in 'heap'
  *               'heap' is non-empty
  */
-HeapNode nodeAt(MinHeap* heap, int nodeIndex);
+HeapNode nodeAt(MinHeap* heap, int nodeIndex) {
+       HeapNode newNode;
+       newNode.id = -1;
+       newNode.priority = -1;
+
+       return newNode;
+}
 
 /* Returns priority of node at index 'nodeIndex' in minheap 'heap'.
  * Precondition: 'nodeIndex' is a valid index in 'heap'
  *               'heap' is non-empty
  */
-int priorityAt(MinHeap* heap, int nodeIndex);
+int priorityAt(MinHeap* heap, int nodeIndex) {
+       return -1;
+}
 
 /* Returns ID of node at index 'nodeIndex' in minheap 'heap'.
  * Precondition: 'nodeIndex' is a valid index in 'heap'
  *               'heap' is non-empty
  */
-int idAt(MinHeap* heap, int nodeIndex);
+int idAt(MinHeap* heap, int nodeIndex) {
+       return -1;
+}
 
 /* Returns index of node with ID 'id' in minheap 'heap'.
  * Precondition: 'id' is a valid ID in 'heap'
  *               'heap' is non-empty
  */
-int indexOf(MinHeap* heap, int id);
+int indexOf(MinHeap* heap, int id) {
+       return -1;
+}
 
 /*********************************************************************
  * Required functions

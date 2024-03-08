@@ -16,6 +16,12 @@
 MinHeap* createHeap(FILE* f);
 void testHeap(MinHeap* heap);
 void printHeapReport(MinHeap* heap);
+MinHeap* newHeap(int capacity) {
+  return NULL;
+}
+void deleteHeap(MinHeap* heap){
+  return;
+}
 
 int main(int argc, char* argv[]) {
   MinHeap* heap = NULL;
