@@ -35,12 +35,12 @@ numNeg xs = length [x | x <- xs, x < 0]
 -- return a list of squares of even integers between low and high, inclusive.
 -- No recursion, no higher-order functions. Use list comprehension!
 -- genSquares :: Int -> Int -> [Int]
-genSquares low high = [x^2 | x <- [low..high], x > low, x <= high] 
+genSquares low high = [x^2 | x <- [low..high], x > low, x <= high]
 
 -- |triples n
 -- return a list of triples (x,y,z) of positive numbers all less than
 -- or equal to n, such that x^2 + y^2 == z^2, with no duplicate triples or
--- premutations of ealier triples.
+-- premutations of earlier triples.
 -- No recursion, no higher-order functions. Use list comprehension!
 -- triples :: Int -> [(Int, Int, Int)]
 triples n = [(x, y, z) | x <- [1..n], x <= n, y <- [x..n], y <= n, z <- [y..n], x^2 + y^2 == z^2]

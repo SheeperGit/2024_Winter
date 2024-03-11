@@ -9,10 +9,20 @@ def interleave(lst1, lst2):
 
     >>> interleave([1, 2, 3], ['a', 'b', 'c'])
     [1, 'a', 2, 'b', 3, 'c']
+    >>> interleave([1, 2, 3, 4], ['a', 'b', 'c'])
+    [1, 'a', 2, 'b', 3, 'c']
+    >>> interleave([1, 2, 3], ['a', 'b', 'c', 'd'])
+    [1, 'a', 2, 'b', 3, 'c']
+    >>> interleave([], ['a', 'b', 'c'])
+    []
+    >>> interleave([1, 2, 3], [])
+    []
+    >>> interleave([], [])
+    []
 
     """
 
-    return 42
+    return [elem for pair in zip(lst1, lst2) for elem in pair]
 
 
 def to_pairs(lst1, lst2):
@@ -25,8 +35,7 @@ def to_pairs(lst1, lst2):
     [(1, 'a'), (2, 'b'), (3, 'c')]
     """
 
-    return 42
-
+    return [pair for pair in zip(lst1, lst2)]
 
 def repeat(func, value, num):
     """Return a list
@@ -37,9 +46,13 @@ def repeat(func, value, num):
 
     >>> repeat(lambda x: 2 * x, 3, 5)
     [3, 6, 12, 24, 48, 96]
+    >>> repeat(lambda x: 2 * x, 3, 0)
+    [3]
     """
 
-    return 42
+    if (num == 0):
+        return [value]
+    return [value] + list(map(func, repeat(func, value, num - 1)))
 
 
 def num_neg(lst1):
@@ -53,7 +66,7 @@ def num_neg(lst1):
 
     """
 
-    return 42
+    return len([x for x in lst1 if x < 0])
 
 
 def gen_squares(low, high):
@@ -61,9 +74,11 @@ def gen_squares(low, high):
 
     This function should use list comprehension, no recursion, and no
     map or other higher-order functions.
+    >>> gen_squares(5, 20)
+    [36, 64, 100, 144, 196, 256, 324, 400]
     """
 
-    return 42
+    return [x**2 for x in range(low, high + 1) if (x > low and x <= high and x % 2 == 0)]
 
 
 def triples(num):
@@ -78,10 +93,12 @@ def triples(num):
 
     >>> triples(5)
     [(3, 4, 5)]
+    >>> triples(15)
+    [(3, 4, 5), (5, 12, 13), (6, 8, 10), (9, 12, 15)]
 
     """
 
-    return 42
+    return [(x,y,z) for x in range(1, num + 1) if (x <= num) for y in range(x, num + 1) if (y <= num) for z in range(y, num + 1) if (x**2 + y**2 == z**2)]
 
 
 if __name__ == '__main__':
