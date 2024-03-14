@@ -4,22 +4,21 @@ package poly;
  * A Pair of X and Y.
  */
 public class Pair<X, Y> {
-    public final X first;
-    public final Y second;
+    private X first;
+    private Y second;
 
     public Pair(X first, Y second) {
         this.first = first;
         this.second = second;
     }
 
-    /* Uncomment to debug */
-    // public X getFirst() {
-    //     return first;
-    // }
+    public X getFirst() {
+        return first;
+    }
 
-    // public Y getSecond() {
-    //     return second;
-    // }
+    public Y getSecond() {
+        return second;
+    }
 
     @Override
     public String toString() {
