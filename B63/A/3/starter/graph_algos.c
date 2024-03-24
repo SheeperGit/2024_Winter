@@ -11,6 +11,7 @@
 
 #define NOTHING -1
 #define DEBUG 0
+#define INF INT_MAX   // New macro for infinity
 
 typedef struct records {
   int numVertices;    // total number of vertices in the graph
@@ -26,39 +27,237 @@ typedef struct records {
 /*************************************************************************
  ** Suggested helper functions -- part of starter code
  *************************************************************************/
+/* Creates, populates, and returns a MinHeap to be used by Prim's and
+ * Dijkstra's algorithms on Graph 'graph' starting from vertex with ID
+ * 'startVertex'.
+ * Precondition: 'startVertex' is valid in 'graph'
+ */
+MinHeap* initHeap(Graph* graph, int startVertex) {
+  MinHeap* heap = newHeap(graph->numVertices);
+  for (int i = 0; i < graph->numVertices; i++) {
+    insert(heap, (i == startVertex) ? 0 : INF, i);
+  }
+
+  return heap;
+}
+
+/* Returns true iff 'heap' is NULL or is empty. */
+bool isEmpty(MinHeap* heap) {
+    return (heap == NULL || heap->size == 0);
+}
+
+/* Add a new edge to records at index ind. */
+void addTreeEdge(Records* records, int ind, int fromVertex, int toVertex, int weight) {
+  records->tree[ind].fromVertex = fromVertex;
+  records->tree[ind].toVertex = toVertex;
+  records->tree[ind].weight = weight;
+  records->numTreeEdges++;
+}
 
 /* Creates, populates, and returns all records needed to run Prim's and
  * Dijkstra's algorithms on Graph 'graph' starting from vertex with ID
  * 'startVertex'.
  * Precondition: 'startVertex' is valid in 'graph'
  */
-Records* initRecords(Graph* graph, int startVertex);
+Records* initRecords(Graph* graph, int startVertex) {
+  Records* records = (Records*) malloc(sizeof(Records));
+  if (records == NULL) {
+    fprintf(stderr, "Error: Failed to create records!\n");
+    exit(EXIT_FAILURE);
+  }
 
-/* Creates, populates, and returns a MinHeap to be used by Prim's and
- * Dijkstra's algorithms on Graph 'graph' starting from vertex with ID
- * 'startVertex'.
- * Precondition: 'startVertex' is valid in 'graph'
- */
-MinHeap* initHeap(Graph* graph, int startVertex);
+  records->numVertices = graph->numVertices;
+  records->heap = initHeap(graph, startVertex);
+  records->finished = (bool*) calloc(graph->numVertices, sizeof(bool));
+  if (records->finished == NULL) {
+    fprintf(stderr, "Error: Failed to create records->finished!\n");
+    free(records);
+    exit(EXIT_FAILURE);
+  }
 
-/* Returns true iff 'heap' is NULL or is empty. */
-bool isEmpty(MinHeap* heap);
+  records->predecessors = (int*) malloc(graph->numVertices * sizeof(int));
+  if (records->predecessors == NULL) {
+    fprintf(stderr, "Error: Failed to create records->predecessors!\n");
+    free(records->finished);
+    free(records);
+    exit(EXIT_FAILURE);
+  }
 
-/* Prints the status of all current algorithm data: good for debugging. */
-void printRecords(Records* records);
+  for (int i = 0; i < graph->numVertices; i++) {
+    records->predecessors[i] = NOTHING;
+  }
+  records->tree = NULL;
+  records->numTreeEdges = 0;
 
-/* Add a new edge to records at index ind. */
-void addTreeEdge(Records* records, int ind, int fromVertex, int toVertex,
-                 int weight);
+  return records;
+}
 
 /* Creates and returns a path from 'vertex' to 'startVertex' from edges
  * in the distance tree 'distTree'.
  */
-EdgeList* makePath(Edge* distTree, int vertex, int startVertex);
+EdgeList* makePath(Edge* distTree, int vertex, int startVertex) {
+  EdgeList* path = NULL;
+  while (vertex != startVertex) {
+    EdgeList* newEdgeNode = newEdgeList(&distTree[vertex], path);
+    path = newEdgeNode;
+    vertex = distTree[vertex].fromVertex;
+  }
+
+  return path;
+}
 
 /*************************************************************************
  ** Required functions
  *************************************************************************/
+/* Runs Prim's algorithm on Graph 'graph' starting from vertex with ID
+ * 'startVertex', and return the resulting MST: an array of Edges.
+ * Returns NULL is 'startVertex' is not valid in 'graph'.
+ * Precondition: 'graph' is connected.
+ */
+Edge* getMSTprim(Graph* graph, int startVertex) {
+  if (startVertex < 0 || startVertex >= graph->numVertices) {
+    // fprintf(stderr, "Error: startVertex is not valid in graph!\n");
+    return NULL;
+  }
+
+  Records* records = initRecords(graph, startVertex);
+  records->tree = (Edge*) malloc((graph->numVertices - 1) * sizeof(Edge));
+  if (records->tree == NULL) {
+    fprintf(stderr, "Error: Failed to create records->tree! (Prim's)\n");
+    deleteHeap(records->heap);
+    free(records->finished);
+    free(records->predecessors);
+    free(records);
+    exit(EXIT_FAILURE);
+  }
+
+  while (!isEmpty(records->heap)) {
+    // printRecords(records);
+    HeapNode minNode = extractMin(records->heap);
+    int curVertex = minNode.id;
+    records->finished[curVertex] = true;
+
+    if (records->predecessors[curVertex] != NOTHING) {
+      addTreeEdge(records, records->numTreeEdges, records->predecessors[curVertex], curVertex, minNode.priority);
+    }
+
+    Vertex* curVertexPtr = graph->vertices[curVertex];
+    EdgeList* adjList = curVertexPtr->adjList;
+    while (adjList != NULL) {
+      int adjVertex = adjList->edge->toVertex;
+      if (!records->finished[adjVertex]) {
+        int prio = getPriority(records->heap, adjVertex);
+        int newPrio = adjList->edge->weight;
+        if (newPrio < prio) {
+          decreasePriority(records->heap, adjVertex, newPrio);
+          records->predecessors[adjVertex] = curVertex;
+        }
+      }
+      adjList = adjList->next;
+    }
+  }
+
+  // Freeing stuff is important! //
+  deleteHeap(records->heap);
+  free(records->finished);
+  free(records->predecessors);
+  Edge* result = records->tree;
+  free(records);
+
+  return result;
+}
+
+/* Runs Dijkstra's algorithm on Graph 'graph' starting from vertex with ID
+ * 'startVertex', and return the resulting distance tree: an array of edges.
+ * Returns NULL if 'startVertex' is not valid in 'graph'.
+ * Precondition: 'graph' is connected.
+ */
+Edge* getDistanceTreeDijkstra(Graph* graph, int startVertex) {
+  // Thankfully, Dijkstra's is very similar to Prim's //
+  if (startVertex < 0 || startVertex >= graph->numVertices) {
+    // fprintf(stderr, "Error: Start vertex is not valid in the graph\n");
+    return NULL;
+  }
+
+  Records* records = initRecords(graph, startVertex);
+  records->tree = (Edge*) malloc((graph->numVertices - 1) * sizeof(Edge));
+  if (records->tree == NULL) {
+    fprintf(stderr, "Error: Failed to create records->tree! (Dijkstra's)\n");
+    deleteHeap(records->heap);
+    free(records->finished);
+    free(records->predecessors);
+    free(records);
+    exit(EXIT_FAILURE);
+  }
+
+  while (!isEmpty(records->heap)) {
+    // printRecords(records);
+    HeapNode minNode = extractMin(records->heap);
+    int curVertex = minNode.id;
+    records->finished[curVertex] = true;
+
+    if (records->predecessors[curVertex] != NOTHING) {
+      addTreeEdge(records, records->numTreeEdges, records->predecessors[curVertex], curVertex, minNode.priority);
+    }
+
+    Vertex* curVertexPtr = graph->vertices[curVertex];
+    EdgeList* adjList = curVertexPtr->adjList;
+    while (adjList != NULL) {
+      int adjVertex = adjList->edge->toVertex;
+      if (!records->finished[adjVertex]) {
+        int prio = getPriority(records->heap, adjVertex);
+        int newPrio = minNode.priority + adjList->edge->weight;   // This `+` is basically the only real change from Prim's
+        if (newPrio < prio) {
+          decreasePriority(records->heap, adjVertex, newPrio);
+          records->predecessors[adjVertex] = curVertex;
+        }
+      }
+      adjList = adjList->next;
+    }
+  }
+
+  // Freeing stuff is important! //
+  deleteHeap(records->heap);
+  free(records->finished);
+  free(records->predecessors);
+  Edge* result = records->tree;
+  free(records);
+
+  return result;
+}
+
+/* Creates and returns an array 'paths' of shortest paths from every vertex
+ * in the graph to vertex 'startVertex', based on the information in the
+ * distance tree 'distTree' produced by Dijkstra's algorithm on a graph with
+ * 'numVertices' vertices and with the start vertex 'startVertex'.  paths[id]
+ * is the list of edges of the form
+ *   [(id -- id_1, w_0), (id_1 -- id_2, w_1), ..., (id_n -- start, w_n)]
+ *   where w_0 + w_1 + ... + w_n = distance(id)
+ * Returns NULL if 'startVertex' is not valid in 'distTree'.
+ */
+EdgeList** getShortestPaths(Edge* distTree, int numVertices, int startVertex) {
+  EdgeList** paths = (EdgeList**) malloc(numVertices * sizeof(EdgeList*));
+  if (paths == NULL) {
+    fprintf(stderr, "Error: Failed to create paths!\n");
+    exit(EXIT_FAILURE);
+  }
+
+  for (int i = 0; i < numVertices; i++) {
+    paths[i] = NULL;
+    if (i == startVertex) { // Skip //
+      continue;
+    }
+
+    int vertex = i;
+    while (vertex != startVertex) {
+      EdgeList* newEdgeNode = newEdgeList(&distTree[vertex], paths[i]);
+      paths[i] = newEdgeNode;
+      vertex = distTree[vertex].fromVertex;
+    }
+  }
+
+  return paths;
+}
 
 
 /*************************************************************************
