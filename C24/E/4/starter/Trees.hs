@@ -5,6 +5,7 @@ data Tree a = Leaf a | Node a (Tree a) (Tree a)
 three = Node "one" (Leaf "two") (Leaf "three")
 five = Node "t" (Node "i" (Leaf "n") (Leaf "y")) (Leaf ":)")
 long xs = length xs > 4
+short xs = length xs < 4
 
 -- |countNodes t
 -- return the number of all nodes in tree t
