@@ -60,36 +60,36 @@ void addTreeEdge(Records* records, int ind, int fromVertex, int toVertex, int we
  * Precondition: 'startVertex' is valid in 'graph'
  */
 Records* initRecords(Graph* graph, int startVertex) {
-  Records* records = (Records*) malloc(sizeof(Records));
-  if (records == NULL) {
+  Records* r = (Records*) malloc(sizeof(Records));
+  if (r == NULL) {
     fprintf(stderr, "Error: Failed to create records!\n");
     exit(EXIT_FAILURE);
   }
 
-  records->numVertices = graph->numVertices;
-  records->heap = initHeap(graph, startVertex);
-  records->finished = (bool*) calloc(graph->numVertices, sizeof(bool));
-  if (records->finished == NULL) {
+  r->numVertices = graph->numVertices;
+  r->heap = initHeap(graph, startVertex);
+  r->finished = (bool*) calloc(graph->numVertices, sizeof(bool));
+  if (r->finished == NULL) {
     fprintf(stderr, "Error: Failed to create records->finished!\n");
-    free(records);
+    free(r);
     exit(EXIT_FAILURE);
   }
 
-  records->predecessors = (int*) malloc(graph->numVertices * sizeof(int));
-  if (records->predecessors == NULL) {
+  r->predecessors = (int*) malloc(graph->numVertices * sizeof(int));
+  if (r->predecessors == NULL) {
     fprintf(stderr, "Error: Failed to create records->predecessors!\n");
-    free(records->finished);
-    free(records);
+    free(r->finished);
+    free(r);
     exit(EXIT_FAILURE);
   }
 
   for (int i = 0; i < graph->numVertices; i++) {
-    records->predecessors[i] = NOTHING;
+    r->predecessors[i] = NOTHING;
   }
-  records->tree = NULL;
-  records->numTreeEdges = 0;
+  r->tree = NULL;
+  r->numTreeEdges = 0;
 
-  return records;
+  return r;
 }
 
 /* Creates and returns a path from 'vertex' to 'startVertex' from edges
@@ -120,37 +120,37 @@ Edge* getMSTprim(Graph* graph, int startVertex) {
     return NULL;
   }
 
-  Records* records = initRecords(graph, startVertex);
-  records->tree = (Edge*) malloc((graph->numVertices - 1) * sizeof(Edge));
-  if (records->tree == NULL) {
+  Records* r = initRecords(graph, startVertex);
+  r->tree = (Edge*) malloc((graph->numVertices - 1) * sizeof(Edge));
+  if (r->tree == NULL) {
     fprintf(stderr, "Error: Failed to create records->tree! (Prim's)\n");
-    deleteHeap(records->heap);
-    free(records->finished);
-    free(records->predecessors);
-    free(records);
+    deleteHeap(r->heap);
+    free(r->finished);
+    free(r->predecessors);
+    free(r);
     exit(EXIT_FAILURE);
   }
 
-  while (!isEmpty(records->heap)) {
+  while (!isEmpty(r->heap)) {
     // printRecords(records);
-    HeapNode minNode = extractMin(records->heap);
+    HeapNode minNode = extractMin(r->heap);
     int curVertex = minNode.id;
-    records->finished[curVertex] = true;
+    r->finished[curVertex] = true;
 
-    if (records->predecessors[curVertex] != NOTHING) {
-      addTreeEdge(records, records->numTreeEdges, records->predecessors[curVertex], curVertex, minNode.priority);
+    if (r->predecessors[curVertex] != NOTHING) {
+      addTreeEdge(r, r->numTreeEdges, r->predecessors[curVertex], curVertex, minNode.priority);
     }
 
     Vertex* curVertexPtr = graph->vertices[curVertex];
     EdgeList* adjList = curVertexPtr->adjList;
     while (adjList != NULL) {
       int adjVertex = adjList->edge->toVertex;
-      if (!records->finished[adjVertex]) {
-        int prio = getPriority(records->heap, adjVertex);
+      if (!r->finished[adjVertex]) {
+        int prio = getPriority(r->heap, adjVertex);
         int newPrio = adjList->edge->weight;
         if (newPrio < prio) {
-          decreasePriority(records->heap, adjVertex, newPrio);
-          records->predecessors[adjVertex] = curVertex;
+          decreasePriority(r->heap, adjVertex, newPrio);
+          r->predecessors[adjVertex] = curVertex;
         }
       }
       adjList = adjList->next;
@@ -158,13 +158,13 @@ Edge* getMSTprim(Graph* graph, int startVertex) {
   }
 
   // Freeing stuff is important! //
-  deleteHeap(records->heap);
-  free(records->finished);
-  free(records->predecessors);
-  Edge* result = records->tree;
-  free(records);
+  deleteHeap(r->heap);
+  free(r->finished);
+  free(r->predecessors);
+  Edge* MST = r->tree;
+  free(r);
 
-  return result;
+  return MST;
 }
 
 /* Runs Dijkstra's algorithm on Graph 'graph' starting from vertex with ID
@@ -179,51 +179,56 @@ Edge* getDistanceTreeDijkstra(Graph* graph, int startVertex) {
     return NULL;
   }
 
-  Records* records = initRecords(graph, startVertex);
-  records->tree = (Edge*) malloc((graph->numVertices - 1) * sizeof(Edge));
-  if (records->tree == NULL) {
+  Records* r = initRecords(graph, startVertex);
+  r->tree = (Edge*) malloc((graph->numVertices - 1) * sizeof(Edge));
+  if (r->tree == NULL) {
     fprintf(stderr, "Error: Failed to create records->tree! (Dijkstra's)\n");
-    deleteHeap(records->heap);
-    free(records->finished);
-    free(records->predecessors);
-    free(records);
+    deleteHeap(r->heap);
+    free(r->finished);
+    free(r->predecessors);
+    free(r);
     exit(EXIT_FAILURE);
   }
+  r->heap = initHeap(graph, startVertex);
+  r->predecessors[startVertex] = startVertex;
 
-  while (!isEmpty(records->heap)) {
+  while (!isEmpty(r->heap)) {
     // printRecords(records);
-    HeapNode minNode = extractMin(records->heap);
+    HeapNode minNode = extractMin(r->heap);
     int curVertex = minNode.id;
-    records->finished[curVertex] = true;
+    r->finished[curVertex] = true;
 
-    if (records->predecessors[curVertex] != NOTHING) {
-      addTreeEdge(records, records->numTreeEdges, records->predecessors[curVertex], curVertex, minNode.priority);
+    if (r->predecessors[curVertex] != NOTHING) {
+      addTreeEdge(r, r->numTreeEdges, r->predecessors[curVertex], curVertex, minNode.priority);
+      // r->numTreeEdges++;
+      r->finished[curVertex] = true;
     }
 
     Vertex* curVertexPtr = graph->vertices[curVertex];
     EdgeList* adjList = curVertexPtr->adjList;
     while (adjList != NULL) {
       int adjVertex = adjList->edge->toVertex;
-      if (!records->finished[adjVertex]) {
-        int prio = getPriority(records->heap, adjVertex);
+      if (!r->finished[adjVertex]) {
+        int prio = getPriority(r->heap, adjVertex);
         int newPrio = minNode.priority + adjList->edge->weight;   // This `+` is basically the only real change from Prim's
-        if (newPrio < prio) {
-          decreasePriority(records->heap, adjVertex, newPrio);
-          records->predecessors[adjVertex] = curVertex;
+        if (r->finished[adjVertex] == false && newPrio < prio) {
+          decreasePriority(r->heap, adjVertex, newPrio);
+          r->predecessors[adjVertex] = curVertex;
         }
       }
       adjList = adjList->next;
     }
+    r->finished[curVertex] = true;
   }
 
   // Freeing stuff is important! //
-  deleteHeap(records->heap);
-  free(records->finished);
-  free(records->predecessors);
-  Edge* result = records->tree;
-  free(records);
+  deleteHeap(r->heap);
+  free(r->finished);
+  free(r->predecessors);
+  Edge* distTree = r->tree;
+  free(r);
 
-  return result;
+  return distTree;
 }
 
 /* Creates and returns an array 'paths' of shortest paths from every vertex

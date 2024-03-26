@@ -103,26 +103,26 @@ Vertex* newVertex(int id, void* value, EdgeList* adjList) {
  * Precondition: numVertices >= 0
  */
 Graph* newGraph(int numVertices) {
-  Graph* graph = (Graph*) malloc(sizeof(Graph));
-  if (graph == NULL) {
+  Graph* G = (Graph*) malloc(sizeof(Graph));
+  if (G == NULL) {
     fprintf(stderr, "Error: Failed to create graph!\n");
     exit(EXIT_FAILURE);
   }
 
-  graph->numVertices = numVertices;
-  graph->numEdges = 0;
-  graph->vertices = (Vertex**) malloc(numVertices * sizeof(Vertex*));
-  if (graph->vertices == NULL) {
+  G->numVertices = numVertices;
+  G->numEdges = 0;
+  G->vertices = (Vertex**) malloc(numVertices * sizeof(Vertex*));
+  if (G->vertices == NULL) {
     fprintf(stderr, "Error: Failed to create graph->vertices!\n");
-    free(graph);
+    free(G);
     exit(EXIT_FAILURE);
   }
 
   for (int i = 0; i < numVertices; i++) {
-    graph->vertices[i] = NULL;
+    G->vertices[i] = NULL;
   }
 
-  return graph;
+  return G;
 }
 
 /* Frees memory allocated for EdgeList starting at 'head'.
