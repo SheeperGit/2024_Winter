@@ -33,7 +33,7 @@ public class Demo {
 
     printResults(emptyset, singleton, three, four);
 
-    // OUTPUT:
+    // EXPECTED OUTPUT:
     // {} < {42}? true
     // {42} <= {2,3,1}? false
     // {1,3,4,2} >= {2,3,1}? true
