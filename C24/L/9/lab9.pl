@@ -95,9 +95,12 @@ nat(X) :-
     X = s(Y), nat(Y).   % Or X is the successor of some natural number
 
 % sum(+X, +Y, ?Z) iff Z is the sum of X and Y
-sum(X,Y,Z) :-       % Note: +X, +Y means that X and Y must be given before calling the predicate, while ?Z is optional to define (e.g., `_` can be used)
-    Z is X + Y.
+sum(zero, Y, Y).        % Additive Identity
+sum(s(X), Y, s(Z)) :-
+    sum(X, Y, Z).
 
 % prod(+X, +Y, ?Z) iff Z is the product of X and Y.
-prod(X,Y,Z) :-
-    Z is X * Y.
+prod(zero, _, zero).    % Multiplicative Identity
+prod(s(X), Y, Z) :-
+    prod(X, Y, W),
+    sum(W, Y, Z).

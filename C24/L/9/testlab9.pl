@@ -18,4 +18,4 @@ test('2*3=6') :-
 
 :- end_tests(lab9).
 
-?- run_tests.
+% ?- run_tests.
