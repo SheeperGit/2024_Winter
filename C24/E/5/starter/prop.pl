@@ -133,7 +133,11 @@ eval(implies(F0, F1), Asst, Value) :-
     eval(F1, Asst, V1),
     imp_val(V0, V1, Value).
 
+imp_val(fls, fls, tru).
 imp_val(tru, fls, fls).
-imp_val(_, _, tru).
+imp_val(fls, tru, tru).
+imp_val(tru, tru, tru).
+
+% imp_val(_, _, tru).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
