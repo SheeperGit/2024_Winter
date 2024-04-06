@@ -1,0 +1,201 @@
+
+formula:
+
+% PL-Unit: formula ............
+ERROR:
+]]
+:
+test and []: failed
+
+ERROR:
+]]
+:
+test and a: failed
+
+..
+ERROR:
+]]
+:
+test or []: failed
+
+ERROR:
+]]
+:
+test or a: failed
+
+........... done
+% 4 tests failed
+% 25 tests passed
+ERROR: -g run_tests(formula): false
+
+sub:
+Test(s) timed out, likely due to infinite run(s).
+
+eval:
+
+% PL-Unit: eval ..
+ERROR:
+]]
+:
+test tru with a/A,b/B: failed
+
+.
+ERROR:
+]]
+:
+test fls with a/A,b/B: failed
+
+.
+ERROR:
+]]
+:
+test a with a/A,b/fls: failed
+
+ERROR:
+]]
+:
+test X with a/tru,b/fls: failed
+
+.
+ERROR:
+]]
+:
+test b with a/tru,b/B: failed
+
+ERROR:
+]]
+:
+test X with a/tru,b/B: failed
+
+.
+ERROR:
+]]
+:
+test not X with a/tru,b/fls: failed
+
+...
+ERROR:
+]]
+:
+test not X with a/tru,b/fls: failed
+
+ERROR:
+]]
+:
+test not not X with a/tru,b/fls: failed
+
+ERROR:
+]]
+:
+test not not not X with a/tru,b/fls: failed
+
+ERROR:
+]]
+:
+test and a with a/tru,b/fls: failed
+
+ERROR:
+]]
+:
+test and a with a/A,b/fls: failed
+
+ERROR:
+]]
+:
+test and a with a/tru,b/B: failed
+
+ERROR:
+]]
+:
+test and X with a/tru,b/fls: failed
+
+.
+ERROR:
+]]
+:
+test a and b with a/A,b/B: failed
+
+ERROR:
+]]
+:
+test a and b and c with a/A,b/B,c/C: failed
+
+ERROR:
+]]
+:
+test X and b and c with a/A,b/B,c/C: failed
+
+.
+ERROR:
+]]
+:
+test or a with a/A,b/fls: failed
+
+ERROR:
+]]
+:
+test or a with a/A,b/B: failed
+
+ERROR:
+]]
+:
+test or X with a/tru,b/fls: failed
+
+ERROR:
+]]
+:
+test a or b with a/A,b/B: failed
+
+ERROR:
+]]
+:
+test a or b or c with a/A,b/B,c/C: failed
+
+ERROR:
+]]
+:
+test X or b or c with a/A,b/B,c/C: failed
+
+..........
+ERROR:
+]]
+:
+test a and tru or not c with a/A,c/C: failed
+
+ERROR:
+]]
+:
+test X and tru or not c with a/A,c/C: failed
+
+..
+ERROR:
+]]
+:
+test a or b or neg(fls) with a/fls,b/fls: failed
+
+ERROR:
+]]
+:
+test a or b or neg(tru) with a/fls,b/fls: failed
+
+ERROR:
+]]
+:
+test a or b or neg(tru) with a/A,b/B: failed
+
+..
+ERROR:
+]]
+:
+test a -> (b or not fls) with a/A,b/B: failed
+
+.
+ERROR:
+]]
+:
+test (x or not y) and a and tru and (b and not (c and d)) and b and c with a/A, x/X, b/B, c/C, d/D: failed
+
+done
+% 30 tests failed
+% 26 tests passed
+ERROR: -g run_tests(eval): false
