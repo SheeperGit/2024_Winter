@@ -22,11 +22,25 @@ bool biggerThanThree(int x) {
     return x > 3;
 }
 
+bool isEven(int x) {
+    return x % 2 == 0;
+}
+
 int main() {
     std::vector<int> nums = {1, 2, 3, 4, 5};
     std::vector<int> result;
 
     std::copy_if(nums.begin(), nums.end(), std::back_inserter(result), biggerThanThree);
+    std::cout << "biggerThanThree: ";
+    for (int num : result) {
+        std::cout << num << " ";
+    }
+
+    std::cout << std::endl;
+    result.clear();
+
+    std::copy_if(nums.begin(), nums.end(), std::back_inserter(result), isEven);
+    std::cout << "isEven: ";
     for (int num : result) {
         std::cout << num << " ";
     }

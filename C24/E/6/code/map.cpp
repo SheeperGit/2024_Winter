@@ -22,11 +22,24 @@ int square(int x) {
     return x * x;
 }
 
+int inc(int x) {
+    return x + 1;
+}
+
 int main() {
     std::vector<int> nums = {1, 2, 3, 4, 5};
+    std::vector<int> result(nums.size());
 
-    std::transform(nums.begin(), nums.end(), nums.begin(), square);
-    for (int num : nums) {
+    std::transform(nums.begin(), nums.end(), result.begin(), square);
+    std::cout << "square: ";
+    for (int num : result) {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+
+    std::transform(nums.begin(), nums.end(), result.begin(), inc);
+    std::cout << "inc:    ";
+    for (int num : result) {
         std::cout << num << " ";
     }
 

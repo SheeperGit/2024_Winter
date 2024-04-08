@@ -1,6 +1,7 @@
 % -*- Mode : Prolog -*- 
 
 :- module(prop, [formula/1, eval/3, sub/3]).
+:- discontiguous prop:eval/3.
 
 same_set(Xs, Ys) :- subset(Xs, Ys), subset(Ys, Xs).
 

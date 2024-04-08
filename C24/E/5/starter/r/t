@@ -1,0 +1,46 @@
+eval(tru, _, tru).
+eval(fls, _, fls).
+eval(neg(tru), _, fls).
+eval(neg(fls), _, tru).
+
+eval(variable(tru), _, tru).
+eval(variable(fls), _, fls).
+
+eval(and([tru, tru]), _, tru).
+eval(and([_, fls]), _, fls).
+eval(and([fls, _]), _, fls).
+
+eval(or([tru, _]), _, tru).
+eval(or([_, tru]), _, tru).
+eval(or([fls, fls]), _, fls).
+
+eval(implies([tru, fls]), _, fls).
+eval(implies([tru, tru]), _, tru).
+eval(implies([fls, fls]), _, tru).
+eval(implies([fls, tru]), _, tru).
+
+eval(variable(F), Asst, V) :- 
+    member(F/V, Asst).
+
+eval([F|_], Asst, V) :- 
+    eval(F, Asst, V).
+
+eval(neg(F), Asst, tru) :- 
+    eval(F, Asst, fls);
+    eval(F, Asst, tru).
+
+eval(and([FH|FT]), Asst, tru) :- 
+    (eval(FH, Asst, tru), eval(FT, Asst, tru));
+    eval(FH, Asst, fls);
+    eval(FT, Asst, fls).
+
+eval(or([FH|FT]), Asst, fls) :- 
+    (eval(FH, Asst, fls), eval(FT, Asst, fls));
+    eval(FH, Asst, tru);
+    eval(FT, Asst, tru).
+
+eval(implies(F0, F1), Asst, fls) :- 
+    (eval(F0, Asst, tru), eval(F1, Asst, fls));
+    (eval(F0, Asst, tru), eval(F1, Asst, tru));
+    (eval(F0, Asst, fls), eval(F1, Asst, fls));
+    (eval(F0, Asst, fls), eval(F1, Asst, tru)).

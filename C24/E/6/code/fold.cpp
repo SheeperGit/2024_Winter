@@ -20,6 +20,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 int sum(int x, int y) {
+    std::cout << x << "+" << y << std::endl;    // Prints the order of evaluations
     return x + y;
 }
 
@@ -35,15 +36,15 @@ int rev_sub(int x, int y) {
 }
 
 int main() {
-    std::vector<int> nums = {1, 2, 3, 4};
+    std::vector<int> nums = {1, 2, 3, 4, 5};
 
-    int sumRes = std::accumulate(nums.begin(), nums.end(), 0, sum);
+    int sumRes = std::accumulate(nums.begin(), nums.end(), 0, sum);     // EQV to foldl (+) 0 nums
     std::cout << "sum: " << sumRes << std::endl;
 
-    int diff = std::accumulate(nums.begin(), nums.end(), 0, sub);
+    int diff = std::accumulate(nums.begin(), nums.end(), 0, sub);       // EQV to foldl (-) 0 nums
     std::cout << "diff: " << diff << std::endl;
 
-    int rev_diff = std::accumulate(std::next(nums.rbegin()), nums.rend(), nums[nums.size() - 1], rev_sub);
+    int rev_diff = std::accumulate(std::next(nums.rbegin()), nums.rend(), nums[nums.size() - 1], rev_sub);  // EQV to foldr (-) 0 nums
     std::cout << "rev_diff: " << rev_diff << std::endl;
 
     return 0;
